@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
   FileJson, 
-  Sparkles, 
   Copy, 
   Check, 
   LayoutTemplate, 
@@ -22,18 +21,13 @@ import {
   SloState, 
   DEFAULT_SLO_STATE, 
   TEMPLATES, 
-  BudgetingMethod, 
   TimeWindowUnit,
-  DocumentKind
 } from './types';
-import { geminiService } from './services/geminiService';
 import { generateYaml } from './utils/yamlGenerator';
 
 const App: React.FC = () => {
   const [sloState, setSloState] = useState<SloState>(DEFAULT_SLO_STATE);
   const [yamlOutput, setYamlOutput] = useState<string>('');
-  const [aiPrompt, setAiPrompt] = useState<string>('');
-  const [isGenerating, setIsGenerating] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   
@@ -124,21 +118,6 @@ const App: React.FC = () => {
   }, [sloState]);
 
   const isValid = Object.keys(errors).length === 0;
-
-  const handleAiGenerate = async () => {
-    if (!aiPrompt.trim()) return;
-    setIsGenerating(true);
-    try {
-      const newState = await geminiService.generateSloFromDescription(aiPrompt);
-      setSloState(prev => ({ ...prev, ...newState, id: '' })); // Reset ID for new generation
-      setAiPrompt('');
-    } catch (error) {
-      console.error('Failed to generate SLO', error);
-      alert('Failed to generate configuration. Please try again.');
-    } finally {
-      setIsGenerating(false);
-    }
-  };
 
   const loadTemplate = (templateKey: string) => {
     const template = TEMPLATES[templateKey];
@@ -338,43 +317,6 @@ const App: React.FC = () => {
               </div>
            </section>
         )}
-
-        {/* AI Assistant Section */}
-        <section className="mb-8">
-          <div className="bg-gradient-to-r from-slate-800 to-slate-800/50 rounded-2xl p-6 border border-slate-700 shadow-xl relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-              <Sparkles className="h-32 w-32 text-brand-500" />
-            </div>
-            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-brand-400" />
-              AI Generator
-            </h2>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <input 
-                type="text" 
-                value={aiPrompt}
-                onChange={(e) => setAiPrompt(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAiGenerate()}
-                placeholder="Describe what you need, e.g., 'Availability SLO referencing a common-errors SLI'"
-                className="flex-1 bg-slate-900 border border-slate-600 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all placeholder-slate-500"
-              />
-              <button 
-                onClick={handleAiGenerate}
-                disabled={isGenerating || !aiPrompt}
-                className="bg-brand-600 hover:bg-brand-500 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-xl font-medium transition-all shadow-lg shadow-brand-900/20 flex items-center justify-center gap-2 min-w-[140px]"
-              >
-                {isGenerating ? (
-                  <span className="animate-pulse">Thinking...</span>
-                ) : (
-                  <>
-                    <Sparkles className="h-4 w-4" />
-                    Generate
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </section>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Editor Column */}

@@ -1,5 +1,5 @@
 {
   "name": "OpenSLO Studio",
-  "description": "A visual editor and AI-powered generator for OpenSLO specifications. Create, validate, and manage your Service Level Objectives with ease.",
+  "description": "A visual editor for OpenSLO specifications. Create, validate, and manage your Service Level Objectives with ease.",
   "requestFramePermissions": []
 }
